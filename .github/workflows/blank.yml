@@ -38,7 +38,7 @@ jobs:
         with:
           path: ${{ env.PIP_CACHE_DIR }}
           key: ${{ env.PIP_CACHE_NAME }}
-          restore-keys: ${{ env.PIP_CACHE_NAME }}
+          restore-keys: requirements.txt
 
 
       - name: Check pip version
