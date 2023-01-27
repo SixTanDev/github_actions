@@ -32,15 +32,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - env:
-          PIP_CACHE_NAME: my-cache-key
+      - name: Set enviroment variable
+        run: echo "PIP_CACHE_NAME=my-cache-key" >> $GITHUB_ENV
       - name: Cache dependencies
         id: cache-dependencies
         uses: actions/cache@v2
         with:
           path: ${{ env.PIP_CACHE_DIR }}
           key: ${{ env.PIP_CACHE_NAME }}
-          #restore-keys: my-cache-key
+          #restore-keys: ${{ env.PIP_CACHE_NAME }}
 
 
       - name: Check pip version
