@@ -46,12 +46,20 @@ jobs:
 
       - name: Check pip version
         run: |
-          PIP_VERSION=$(pip --version | awk '{print $2}')
-          if [ "$PIP_VERSION" != "$(pip show pip | grep '^Version: ' | awk '{print $2}')" ]; then
+          # Check the version of pip installed
+          installed_version=$(pip --version | awk '{print $2}')
+
+          # Gets the latest available version of pip
+          latest_version=$(pip show pip | grep '^Version: ' | awk '{print $2}')
+
+          # Compare the versions
+          if [ "$installed_version" != "$latest_version" ]; then
             echo "Updating pip"
+            # Actualiza pip
             python -m pip install --upgrade pip
           else
-            echo "pip is up-to-date"
+            echo "pip is up-to-dateo"
+          fi
 
 
       - name: Install dependencies
