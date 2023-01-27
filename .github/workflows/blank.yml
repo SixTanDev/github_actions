@@ -32,6 +32,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - env:
+          PIP_CACHE_NAME: my-cache-key
       - name: Cache dependencies
         id: cache-dependencies
         uses: actions/cache@v2
