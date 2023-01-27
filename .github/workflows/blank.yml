@@ -38,7 +38,7 @@ jobs:
         with:
           path: ${{ env.PIP_CACHE_DIR }}
           key: ${{ env.PIP_CACHE_NAME }}
-          restore-keys: requirements.txt
+          restore-keys: my-cache-key
 
 
       - name: Check pip version
@@ -46,7 +46,7 @@ jobs:
           PIP_VERSION=$(pip --version | awk '{print $2}')
           if [ "$PIP_VERSION" != "$(pip show pip | grep '^Version: ' | awk '{print $2}')" ]; then
             echo "Updating pip"
-            pip install --upgrade pip
+            python -m pip install --upgrade pip
           else
             echo "pip is up-to-date"
 
