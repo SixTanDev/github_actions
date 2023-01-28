@@ -37,6 +37,12 @@ jobs:
           echo "PIP_CACHE_NAME=my-cache-key" >> $GITHUB_ENV
           echo "PIP_CACHE_DIR=cache" >> $GITHUB_ENV
           echo "PROJECT_MAIN" >> env.PIP_CACHE_KEY
+      
+      - name: Hash files
+        id: hash_files
+        run: |
+          echo ::set-output name=hash::$(md5sum requirements.txt)
+      
   
       - name: Cache dependencies
         id: cache-dependencies
@@ -74,12 +80,13 @@ jobs:
       
       - name: Create cache directory
         run: mkdir -p  ~/.cache/pip
-          
+    
+    
       - name: Cache dependencies v2
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ env.PIP_CACHE_KEY }}
+          key: ${{ runner.os }}-pip-${{ steps.hash_files.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
