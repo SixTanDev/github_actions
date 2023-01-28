@@ -42,6 +42,15 @@ jobs:
         id: hash_files
         run: |
           echo ::set-output name=hash::$(md5sum requirements.txt)
+          
+      - name: Cache pip packages
+        run: |
+          mkdir -p $HOME/.cache/pip
+          echo "export PIP_CACHE_DIR=$HOME/.cache/pip" >> $GITHUB_ENV
+          echo "export PIP_CACHE_KEY=pip-cache-${{ github.sha }}" >> $GITHUB_ENV
+        env:
+          PIP_CACHE_DIR: ${{ env.HOME }}/.cache/pip
+          PIP_CACHE_KEY: pip-cache-${{ env.GITHUB_SHA }}
       
   
       - name: Cache dependencies
@@ -85,8 +94,8 @@ jobs:
       - name: Cache dependencies v2
         uses: actions/cache@v3
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ steps.hash_files.outputs.hash }}
+          path: $PIP_CACHE_DIR
+          key: $PIP_CACHE_KEY
           restore-keys: |
             ${{ runner.os }}-pip-
 
