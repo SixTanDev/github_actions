@@ -11,11 +11,12 @@ on:
   # Allows you to run this workflow manually from the Actions tab or from GitHub API
   workflow_dispatch:
 
+env:
+  PIP_CACHE_NAME: pip-cache-${{ github.sha }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-          PIP_CACHE_NAME: pip-cache-${{ github.sha }}
 
     # Allows you to execute the same action in several different work environments at the same time.
     strategy:
