@@ -109,3 +109,4 @@ typing_extensions==4.4.0
 uvicorn==0.20.0
 wcwidth==0.2.5
 wrapt==1.14.1
+pre-commit==3.0.1
