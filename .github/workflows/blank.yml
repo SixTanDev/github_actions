@@ -11,10 +11,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab or from GitHub API
   workflow_dispatch:
 
-env:
-  PIP_CACHE_NAME: NONE
-  PIP_CACHE_DIR: NONE
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,13 +32,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
     
       - name: Set environment variable
-       
         run: |
           echo "PIP_CACHE_NAME=pip-cache-${{ github.sha }}" >> $GITHUB_ENV
           echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> $GITHUB_ENV
-        env:
-          PIP_CACHE_NAME: PIP_CACHE_NAME
-          PIP_CACHE_DIR: PIP_CACHE_DIR
 
       - name: Create cache directory
         run: mkdir -p $HOME/.cache/pip
