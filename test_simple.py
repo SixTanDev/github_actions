@@ -1,3 +1,4 @@
+#pylint:  disable=W0105
 """_summary_
 """
 def test_example():
