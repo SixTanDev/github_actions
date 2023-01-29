@@ -20,6 +20,9 @@ jobs:
     - name: Install coverage
       run: |
         pip install coverage
+    - name: Install pytest
+      run: |
+        pip install pytest
     - name: Coverage
       run: |
         coverage run -m pytest
