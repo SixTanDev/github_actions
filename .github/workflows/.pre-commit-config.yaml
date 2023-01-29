@@ -1,0 +1,7 @@
+-   repo: https://github.com/SixTanDev/github_actions/tree/SixTanDev-patch-2
+    hooks:
+    -   id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
