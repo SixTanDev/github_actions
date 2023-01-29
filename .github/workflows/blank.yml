@@ -1,4 +1,4 @@
-name: implement_pilint
+name: Check and PyLint Code
 
 # Controls when the workflow will run
 on:
@@ -11,56 +11,34 @@ on:
   # Allows you to run this workflow manually from the Actions tab or from GitHub API
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on (i.e the server)
     runs-on: ubuntu-latest
+
     # Allows you to execute the same action in several different work environments at the same time.
     strategy:
       matrix:
         python-version: ["3.8", "3.10", "3.11"]
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:     
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it --> i.e this is a github "action"
-      - uses: actions/checkout@v3
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Set enviroment variable
+    
+      - name: Set environment variable
         run: |
-          echo "PIP_CACHE_NAME=my-cache-key" >> $GITHUB_ENV
-          echo "PIP_CACHE_DIR=cache" >> $GITHUB_ENV
-          echo "PROJECT_MAIN" >> env.PIP_CACHE_KEY
-      
-      - name: Hash files
-        id: hash_files
-        run: |
-          echo ::set-output name=hash::$(md5sum requirements.txt)
-          
-      - name: Cache pip packages
-        run: |
-          mkdir -p $HOME/.cache/pip
-          echo "export PIP_CACHE_DIR=$HOME/.cache/pip" >> $GITHUB_ENV
-          echo "export PIP_CACHE_KEY=pip-cache-${{ github.sha }}" >> $GITHUB_ENV
-        env:
-          PIP_CACHE_DIR: ${{ env.HOME }}/.cache/pip
-          PIP_CACHE_KEY: pip-cache-${{ env.GITHUB_SHA }}
-      
+          echo "PIP_CACHE_NAME=pip-cache-${{ github.sha }}" >> $GITHUB_ENV
+          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> $GITHUB_ENV
   
-      - name: Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.PIP_CACHE_DIR }}
-          key: ${{ env.PIP_CACHE_NAME }}
-
-
+      - name: Create cache directory
+        run: mkdir -p $HOME/.cache/pip
+      
       - name: Check pip version
         run: |
           # Check the version of pip installed
@@ -77,35 +55,29 @@ jobs:
           else
             echo "pip is up-to-dateo"
           fi
-
-
+          
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-      
-      - name: Analysing the code with pylint
-        run: |
-          pylint $(git ls-files '*.py')
-      
-      - name: Create cache directory
-        run: mkdir -p  ~/.cache/pip
-    
-    
-      - name: Cache dependencies v2
-        uses: actions/cache@v3
+          
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
         with:
           path: $PIP_CACHE_DIR
-          key: $PIP_CACHE_KEY
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
+          key: $PIP_CACHE_NAME
+          
+      - name: Pylint code
+        run: |
+          pylint $(git ls-files '*.py')
+          
       - name: Save cache
         if: always()
         id: save-cache
         uses: actions/cache@v2
         with:
-          path: ${{ env.PIP_CACHE_DIR }}
-          key: ${{ env.PIP_CACHE_NAME }}
+          path: $PIP_CACHE_DIR
+          key: $PIP_CACHE_NAME
           save: true
 
       
