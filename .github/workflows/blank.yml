@@ -18,7 +18,7 @@ jobs:
     # Allows you to execute the same action in several different work environments at the same time.
     strategy:
       matrix:
-        python-version: ["3.8", "3.10", "3.11"]
+        python-version: ["3.10", "3.11"]
 
 
     steps:
