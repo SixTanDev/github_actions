@@ -11,9 +11,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab or from GitHub API
   workflow_dispatch:
 
-#env:
-#  PIP_CACHE_NAME: pip-cache-${{ github.sha }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,6 +33,7 @@ jobs:
     
       - name: Set environment variable
         run: |
+          echo "PIP_CACHE_NAME=pip-cache-${{ github.sha }}" >> $GITHUB_ENV
           echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> $GITHUB_ENV
 
       - name: Create cache directory
@@ -65,7 +63,7 @@ jobs:
         if: steps.pip-install.outputs.cache-hit != 'true'
         with:
           path: $PIP_CACHE_DIR
-          key: pip-cache-${{ github.sha }}
+          key: $PIP_CACHE_NAME
 
       
       - name: Install dependencies
@@ -82,7 +80,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: $PIP_CACHE_DIR
-          key: pip-cache-${{ github.sha }}
+          key: $PIP_CACHE_NAME
           
       - name: Pylint code
         run: |
@@ -94,6 +92,5 @@ jobs:
         uses: actions/cache@v2
         with:
           path: $PIP_CACHE_DIR
-          key: pip-cache-${{ github.sha }}
+          key: $PIP_CACHE_NAME
           save: true
-
