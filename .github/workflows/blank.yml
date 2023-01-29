@@ -1,0 +1,98 @@
+name: Check and PyLint Code
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the branchs "alfa" and "dev"
+  push:
+    branches: [ "alfa", "dev", "main"]
+  pull_request:
+    branches: [ "alfa", "dev", "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab or from GitHub API
+  workflow_dispatch:
+
+env:
+  PIP_CACHE_NAME: pip-cache-${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Allows you to execute the same action in several different work environments at the same time.
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+    
+      - name: Set environment variable
+        run: |
+          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> $GITHUB_ENV
+
+      - name: Create cache directory
+        run: mkdir -p $HOME/.cache/pip
+      
+      - name: Check pip version
+        run: |
+          # Check the version of pip installed
+          installed_version=$(pip --version | awk '{print $2}')
+
+          # Gets the latest available version of pip
+          latest_version=$(pip show pip | grep '^Version: ' | awk '{print $2}')
+
+          # Compare the versions
+          if [ "$installed_version" != "$latest_version" ]; then
+            echo "Updating pip"
+            # Actualiza pip
+            python -m pip install --upgrade pip
+          else
+            echo "pip is up-to-dateo"
+          fi
+
+
+      - name: Restore pip cache
+        uses: actions/cache@v2
+        id: pip-cache
+        if: steps.pip-install.outputs.cache-hit != 'true'
+        with:
+          path: $PIP_CACHE_DIR
+          key: $PIP_CACHE_NAME
+
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          if [ $? -ne 0 ]; then
+            echo "Cache restored, but some dependencies failed to install. Installing them all again."
+            rm -rf $PIP_CACHE_DIR
+            pip install -r requirements.txt
+          fi
+    
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: $PIP_CACHE_DIR
+          key: $PIP_CACHE_NAME
+          
+      - name: Pylint code
+        run: |
+          pylint $(git ls-files '*.py')
+          
+      - name: Save cache
+        if: always()
+        id: save-cache
+        uses: actions/cache@v2
+        with:
+          path: $PIP_CACHE_DIR
+          key: $PIP_CACHE_NAME
+          save: true
