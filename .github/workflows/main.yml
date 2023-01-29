@@ -18,7 +18,8 @@ jobs:
         pip install -r requirements.txt
     - uses: pre-commit/action@v3.0.0
       with:
-        config_file: .pre-commit-config.yaml
+        extra_args: flake8 --all-files
+        config_file: ./.pre-commit-config.yaml
     - name: Coverage
       run: |
         coverage run -m pytest
