@@ -33,8 +33,8 @@ jobs:
     
       - name: Set environment variable
         run: |
-          echo "PIP_CACHE_NAME=pip-cache-${{ github.sha }}" >> $GITHUB_ENV
-          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> $GITHUB_ENV
+          echo "PIP_CACHE_NAME=pip-cache-${{ github.sha }}" >> $GITHUB_CACHE_NAME
+          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> $GITHUB_CACHE_DIR
   
       - name: Create cache directory
         run: mkdir -p $HOME/.cache/pip
@@ -62,8 +62,8 @@ jobs:
         id: pip-cache
         if: steps.pip-install.outputs.cache-hit != 'true'
         with:
-          path: $PIP_CACHE_DIR
-          key: $PIP_CACHE_NAME
+          path: $GITHUB_CACHE_DIR
+          key: $GITHUB_CACHE_NAME
 
       
       - name: Install dependencies
@@ -71,7 +71,7 @@ jobs:
           pip install -r requirements.txt
           if [ $? -ne 0 ]; then
             echo "Cache restored, but some dependencies failed to install. Installing them all again."
-            rm -rf $PIP_CACHE_DIR
+            rm -rf $GITHUB_CACHE_DIR
             pip install -r requirements.txt
           fi
     
@@ -79,8 +79,8 @@ jobs:
         id: cache-dependencies
         uses: actions/cache@v2
         with:
-          path: $PIP_CACHE_DIR
-          key: $PIP_CACHE_NAME
+          path: $GITHUB_CACHE_DIR
+          key: $GITHUB_CACHE_NAME
           
       - name: Pylint code
         run: |
@@ -91,6 +91,6 @@ jobs:
         id: save-cache
         uses: actions/cache@v2
         with:
-          path: $PIP_CACHE_DIR
-          key: $PIP_CACHE_NAME
+          path: $GITHUB_CACHE_DIR
+          key: $GITHUB_CACHE_NAME
           save: true      
