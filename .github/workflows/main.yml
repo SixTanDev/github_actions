@@ -17,6 +17,9 @@ jobs:
       run: |
         pip install -r requirements.txt
     - uses: pre-commit/action@v3.0.0
+    - name: Install coverage
+      run: |
+        pip install coverage
     - name: Coverage
       run: |
         coverage run -m pytest
